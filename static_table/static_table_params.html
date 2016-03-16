@@ -1,0 +1,22 @@
+<div ng-controller="KbnStaticTableController">
+	<div class="form-group">
+		<label>Field to filter</label><br/>
+		<select ng-model="filteredField" ng-options="option for option in data.fieldsArr" class="form-control"/>
+		<input id="filter-value" type="text" ng-model="filterValue" class="form-control" placeholder="Type a value to filter..">
+		<button ng-click="addFilter(filterValue)">Add</button><br/>
+		<div class="filters-table"></div>
+			<label><u>Filters List:</u></label>
+			<div ng-repeat="(key, value) in vis.params.filters">
+				<a class="filters-table-column">{{key}}</a><a class="filters-table-column">{{value}}</a><u class="filters-table-column-button" ng-click="removeFilter(key)" href="#">remove</u><br/>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label>Result size </label><br/>
+		<input type="number" ng-model="vis.params.resultLimit" min="1" class="form-control"/>
+	</div>
+	<div class="form-group">
+		<label>Alias JSON (Advanced) </label><br/>
+		<textarea ng-model="vis.params.alias" class="form-control" rows="20"></textarea>
+	</div>
+</div>
