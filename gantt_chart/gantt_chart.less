@@ -1,0 +1,73 @@
+@import (reference) "../../styles/_mixins.less";
+@import (reference) "lesshat.less";
+
+.vis-editor {
+
+  &.vis-type-filter {
+
+    .visualization-options {
+      .flex-parent();
+      .flex(1, 1, auto);
+    }
+
+    .filter-options {
+      .flex-parent();
+      .flex(1, 1, auto);
+
+      textarea {
+        .flex(1, 1, auto);
+        resize: none;
+      }
+
+    }
+
+  }
+
+}
+
+.static-table-vis {
+  width: 100%;
+  padding: 3px 13px 13px 13px;
+}
+.static-table {
+  width: 100%;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+.static-header-column {
+  width: 40%;
+}
+.static-value-column {
+  width: 60%;
+}
+.static-table > tbody > tr > td {
+  font-size: 12px;
+  border-bottom: 1px solid #ecf0f1;
+  padding: 5px;
+}
+.static-table > tbody > tr > td > label {
+  font-size: 12px;
+  margin: 0px;
+}
+.static-table > tbody > tr {
+  line-height: 1.2;
+}
+.static-table > tbody > tr:hover {
+  background-color: #ecf0f1;
+}
+#filter-value {
+  float: left;
+  width: 80%;
+}
+.filters-table-column {
+  padding-right: 10px;
+  padding-left: 5px;
+  border-right: 1px solid #ecf0f1;
+}
+.filters-table-column-button {
+  padding-left: 5px;
+  position: fixed;
+}
+.filters-table {
+  margin-top: 5px;
+}
