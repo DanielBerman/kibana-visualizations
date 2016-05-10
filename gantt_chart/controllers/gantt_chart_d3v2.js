@@ -12,11 +12,19 @@ define(function (require) {
 	    var DEFAULT_BLOCK_COLOR = "#57c17b";
 	    
 	    var margin = {
-		top : 20,
-		right : 40,
-		bottom : 20,
-		left : 150
+		top : 10,
+		right : 65,
+		bottom : 40,
+		left : 75
 	    };
+
+	    var padding = {
+		top : 10,
+		right : 10,
+		bottom : 10,
+		left : 10
+	    };
+
 	    var timeDomainStart = d3.time.day.offset(new Date(),-3);
 	    var timeDomainEnd = d3.time.hour.offset(new Date(),+3);
 	    var timeDomainMode = FIT_TIME_DOMAIN_MODE;// fixed or fit
@@ -73,7 +81,7 @@ define(function (require) {
 
 	    var initAxis = function() {
 
-			x = d3.time.scale().domain([ timeDomainStart, timeDomainEnd ]).range([ 0, width ]).clamp(true);
+			x = d3.time.scale().domain([ timeDomainStart, timeDomainEnd ]).range([ 0, width - margin.left - margin.right ]).clamp(true);
 			y = d3.scale.ordinal().domain(taskTypes).rangeRoundBands([ 0, height - margin.top - margin.bottom ], .1);
 
 			xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(tickFormatter).ticks(ticks);
@@ -82,20 +90,26 @@ define(function (require) {
 	    
 	    function gantt(tasks, element) {
 
+	    	containerElement = $(element);
+
+	    	width = containerElement.width() - padding.left - padding.right;
+	    	height = containerElement.height() - padding.top - padding.bottom;
+
+	    	width = width < 440 ? 440 : width;
+	    	height = height < 150 ? 150 : height;
+
 			initTimeDomain(tasks);
 			initAxis();
 
-			$(element).empty();
+			containerElement.empty();
 
 			var svg = d3.select(element)
 			.append("svg")
 			.attr("class", "chart")
-			.attr("width", width + margin.left + margin.right)
-			.attr("height", height + margin.top + margin.bottom)
+			.attr("width", width)
+			.attr("height", height)
 			.append("g")
 		    .attr("class", "gantt-chart")
-			.attr("width", width + margin.left + margin.right)
-			.attr("height", height + margin.top + margin.bottom)
 			.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
 			
 		    svg.selectAll(".chart")

@@ -1,4 +1,16 @@
-<div ng-controller="KbnGanttChartController" style="width:400px">
-	<div class="table-vis" id="chart_div" style="width:100%">
-	</div>
+<div ng-controller="KbnGanttChartController" class="table-vis">
+	<div ng-switch="state">
+    	<div ng-switch-when="full">
+	    	<div id="chart_div">
+		    </div>
+	    </div>
+	    <div ng-switch-when="empty" class="text-center visualize-error visualize-chart">
+	    	<div class="item top"></div>
+			<div class="item">
+				<h2 aria-hidden="true"><i aria-hidden="true" class="fa fa-meh-o"></i></h2>
+				<h4>No results found</h4>
+			</div>
+			<div class="item bottom"></div>
+	    </div>
+    </div>
 </div>
