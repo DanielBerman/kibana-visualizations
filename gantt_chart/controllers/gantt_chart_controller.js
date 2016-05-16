@@ -3,6 +3,12 @@ define(function (require) {
   var module = require('modules').get('kibana/gantt_chart', ['kibana']);
   module.controller('KbnGanttChartController', function ($scope, Private, courier, config, globalState) {
 
+    var resultsState = 
+    {
+      full: "full",
+      empty: "empty"
+    }
+
     var SearchSource = Private(require('components/courier/data_source/search_source'));
     var CallClient = Private(require('components/courier/fetch/_call_client'));
     var searchStrategy = Private(require('components/courier/fetch/strategy/search'));
@@ -16,7 +22,7 @@ define(function (require) {
       if ($scope.init) {
         return;
       }
-        $scope.state = "full";
+        $scope.state = resultsState.full;
         $scope.searchIndex = $scope.searchIndex ? $scope.searchIndex : config.get('defaultIndex');
         $scope.vis.params.resultLimit = $scope.vis.params.resultLimit ? $scope.vis.params.resultLimit : 1;
         $scope.vis.params.filters = $scope.vis.params.filters ? $scope.vis.params.filters : {};
@@ -32,7 +38,7 @@ define(function (require) {
         var dateFieldsArr = [];
         $scope.data = {};
 
-        // The courier needs time to initialize.
+        // The courier needs time to initialize or else there is a weird kibana error in the console.
         setTimeout(function() {
           courier.indexPatterns.get($scope.searchIndex).then(function(indexPattern) {
             indexPattern.fields.forEach(function(elem) {
@@ -76,6 +82,7 @@ define(function (require) {
 
     $scope.$watch('esResponse', getData);
 
+    // This shrinks the yaxis labels to align the widget time scale with other kibana widgets.
     function shrinkName(stringToShrink) {
       var labelMaxLength = 12;
 
@@ -95,6 +102,10 @@ define(function (require) {
           newBlock["startDate"] = new Date(elem.start);
           newBlock["endDate"] = new Date(elem.end);
           newBlock["taskName"] = shrinkName(elem.name);
+
+          $scope.customFields.forEach(function (customFieldName) {
+            newBlock[customFieldName] = elem[customFieldName];
+          })
 
           // If breakby field enabled then get field for color.
           if ($scope.vis.params.colorEnabled) {
@@ -143,6 +154,7 @@ define(function (require) {
         var format;
         var ticks = 10
 
+        // Time format for diffrent scale views
         if ((timeDiff <= 0)){
           format = "%H:%M:%S";
         } else if (timeDiff <= 24) {
@@ -157,7 +169,8 @@ define(function (require) {
           .tickFormat(format)
           .ticks(ticks)
           .timeDomainMode("fixed")
-          .timeDomain(new Date(startTime.format()), new Date(endTime.format()));
+          .timeDomain(new Date(startTime.format()), new Date(endTime.format()))
+          .tooltipFields($scope.customFields);
 
         // If color breakby enabled then use the Kibana color factory as a color function.
         if ($scope.vis.params.colorEnabled) {
@@ -168,7 +181,7 @@ define(function (require) {
               colorConf = JSON.parse($scope.vis.params.colorAlias);
             }
           } catch (ex) {
-            // Display to user?
+            // Display?
             //console.log('Failed to parse color configuration');
           }
 
@@ -193,21 +206,23 @@ define(function (require) {
 
         $scope.dataTableList = [];
 
+        // Only if filter value was configured
         if ($scope.vis.params.filterValue) {
           searchES().then(function(res) {
+            // If no error campe up and hits exist.
             if (res[0].hits) {
               if (res[0].hits.total > 0) {
-                $scope.state = "full";
+                $scope.state = resultsState.full;
                 buildResultSet(res[0].hits.hits);
               } else {
-                $scope.state = "empty";
+                $scope.state = resultsState.empty;
               }
             } else {
-              $scope.state = "empty";
+              $scope.state = resultsState.empty;
             }
           })
         } else {
-          $scope.state = "empty";
+          $scope.state = resultsState.empty;
         }
       }
     }
@@ -234,10 +249,35 @@ define(function (require) {
       hits.forEach(function (elem, idx) {
         var newBlock = {};
 
+        // Get the configured fields to build the chart
         newBlock.start = elem._source[$scope.vis.params.startDateField];
         newBlock.end = elem._source[$scope.vis.params.endDateField];
         newBlock.name = elem._source[$scope.vis.params.breakByField];
 
+        // Custom fields for the tooltip
+        $scope.customFields = [$scope.vis.params.breakByField];
+        // This will take the tooltip configuration from the params screen.
+        if ($scope.vis.params.tooltipFields) {
+          try {
+            var tooltipConf = JSON.parse($scope.vis.params.tooltipFields);
+
+            if (tooltipConf instanceof Array) {
+              tooltipConf.forEach(function (conf) {
+                $scope.customFields.push(conf);
+              })
+            }
+          } catch (ex) {
+            // Display?
+            //console.log('Failed to parse custom tooltip configuration');
+          }
+        }
+
+        // If field doesn't exists put an n/a instead.
+        $scope.customFields.forEach(function (customFieldName) {
+          newBlock[customFieldName] = elem._source[customFieldName] ? elem._source[customFieldName] : "n/a";
+        })
+
+        // Set a color field if enabled
         if ($scope.vis.params.colorEnabled) {
           newBlock.color = elem._source[$scope.vis.params.colorField];
         }
@@ -286,10 +326,6 @@ define(function (require) {
       }
 
       return filter;
-    }
-
-    $scope.advanced = function () {
-      console.log('test');
     }
   });
 });

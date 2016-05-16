@@ -31,6 +31,7 @@ define(function (require) {
 	    var taskTypes = [];
 	    var height = document.body.clientHeight - margin.top - margin.bottom-5;
 	    var width = document.body.clientWidth - margin.right - margin.left-5;
+	    var tooltipFields = [];
 
 	    var tickFormat = "%H:%M";
 	    var ticks = 10;
@@ -92,91 +93,117 @@ define(function (require) {
 
 	    	containerElement = $(element);
 
+	    	// Set minimal and active size for the chart.
 	    	width = containerElement.width() - padding.left - padding.right;
 	    	height = containerElement.height() - padding.top - padding.bottom;
 
 	    	width = width < 440 ? 440 : width;
 	    	height = height < 150 ? 150 : height;
 
+	    	// Init time domain and axis
 			initTimeDomain(tasks);
 			initAxis();
 
+			// Empty previous chart draw, the redraw function should be used somewhow instead.
 			containerElement.empty();
 
+			var tooltip = d3.select("body").append("div")   
+					    .attr("class", "gantt-tooltip")               
+					    .style("opacity", 0);
+
 			var svg = d3.select(element)
-			.append("svg")
-			.attr("class", "chart")
-			.attr("width", width)
-			.attr("height", height)
-			.append("g")
-		    .attr("class", "gantt-chart")
-			.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+				.append("svg")
+				.attr("class", "chart")
+				.attr("width", width)
+				.attr("height", height)
+				.append("g")
+			    .attr("class", "gantt-chart")
+				.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
 			
 		    svg.selectAll(".chart")
-			 .data(tasks, keyFunction).enter()
-			 .append("rect")
-			 .attr("rx", 5)
-		     .attr("ry", 5)
-			 .style("fill", function(d){
-			 	return colorFunction(d.color);
-			 })
-			 .attr("y", 0)
-			 .attr("transform", rectTransform)
-			 .attr("height", function(d) { return y.rangeBand(); })
-			 .attr("width", function(d) {
-			    return (x(d.endDate) - x(d.startDate)); 
-			 });
+				.data(tasks, keyFunction).enter()
+				.append("rect")
+				.attr("rx", 5)
+				.attr("ry", 5)
+				.style("fill", function(d){
+			 		return colorFunction(d.color);
+			 	})
+				.attr("transform", rectTransform)
+				.attr("height", function(d) { return y.rangeBand(); })
+				.attr("width", function(d) {
+					return (x(d.endDate) - x(d.startDate)); 
+				})
+				.on('mouseover', function (d) {
+					tooltip.transition().duration(200).style("opacity", .93);      
+				    tooltip.html(TooltipFormatter(d))
+				      .style("left", (d3.event.pageX) + "px")     
+				      .style("top", (d3.event.pageY) + "px");
+				})
+				.on('mouseout', function (d) {
+					tooltip.transition().duration(300).style("opacity", 0);  
+				});
 			 
 			 
 			svg.append("g")
-			 .attr("class", "x axis")
-			 .attr("transform", "translate(0, " + (height - margin.top - margin.bottom) + ")")
-			 .transition()
-			 .call(xAxis);
+				.attr("class", "x axis")
+				.attr("transform", "translate(0, " + (height - margin.top - margin.bottom) + ")")
+				.transition()
+				.call(xAxis);
 			 
 			svg.append("g").attr("class", "y axis").transition().call(yAxis);
-			 
+
 			return gantt;
 	    };
+
+	    var TooltipFormatter = function (dataElement) {
+	    	
+	    	var html = "<table>";
+
+	    	tooltipFields.forEach(function (elem) {
+	    		html += "<tr><td><b>" + elem + "</b></td><td>" + dataElement[elem] + "</td></tr>";
+	    	})
+
+	    	return html;
+	    }
 	    
-	    gantt.redraw = function(tasks) {
-		initTimeDomain(tasks);
-		initAxis();
+	 //    gantt.redraw = function(tasks) {
+		// initTimeDomain(tasks);
+		// initAxis();
 		
-	    var svg = d3.select("svg");
+	 //    var svg = d3.select("svg");
 
-	    var ganttChartGroup = svg.select(".gantt-chart");
-	    var rect = ganttChartGroup.selectAll("rect").data(tasks, keyFunction);
+	 //    var ganttChartGroup = svg.select(".gantt-chart");
+	 //    var rect = ganttChartGroup.selectAll("rect").data(tasks, keyFunction);
 	        
-        rect.enter()
-        .insert("rect",":first-child")
-        .attr("rx", 5)
-        .attr("ry", 5)
-	 	.style("fill", function(d){
-		 	return colorFunction(d.color);
-		 })
-	 	.transition()
-	 	.attr("y", 0)
-		.attr("transform", rectTransform)
-	 	.attr("height", function(d) { return y.rangeBand(); })
-	 	.attr("width", function(d) { 
-	    	return (x(d.endDate) - x(d.startDate)); 
-	    });
+  //       rect.enter()
+  //       .insert("rect",":first-child")
+  //       .attr("rx", 5)
+  //       .attr("ry", 5)
+	 // 	.style("fill", function(d){
+		//  	return colorFunction(d.color);
+		//  })
+	 // 	.transition()
+	 // 	.attr("y", 0)
+		// .attr("transform", rectTransform)
+	 // 	.attr("height", function(d) { return y.rangeBand(); })
+	 // 	.attr("width", function(d) { 
+	 //    	return (x(d.endDate) - x(d.startDate)); 
+	 //    });
 
-	    rect.transition()
-        .attr("transform", rectTransform)
-	 	.attr("height", function(d) { return y.rangeBand(); })
-	 	.attr("width", function(d) { 
-	    	return (x(d.endDate) - x(d.startDate)); 
-	    });
+	 //    rect.transition()
+  //       .attr("transform", rectTransform)
+	 // 	.attr("height", function(d) { return y.rangeBand(); })
+	 // 	.attr("width", function(d) { 
+	 //    	return (x(d.endDate) - x(d.startDate)); 
+	 //    });
 	        
-		rect.exit().remove();
+		// rect.exit().remove();
 
-		svg.select(".x").transition().call(xAxis);
-		svg.select(".y").transition().call(yAxis);
+		// svg.select(".x").transition().call(xAxis);
+		// svg.select(".y").transition().call(yAxis);
 		
-		return gantt;
-	    };
+		// return gantt;
+	 //    };
 
 	    gantt.margin = function(value) {
 		if (!arguments.length)
@@ -243,6 +270,13 @@ define(function (require) {
 	    // Generates a color for the gantt bars.
 	    gantt.colorFunction = function (value) {
 	    	colorFunction = value;
+	    	return gantt;
+	    }
+
+	    // Generates a color for the gantt bars.
+	    gantt.tooltipFields = function (value) {
+	    	tooltipFields = value;
+	    	return gantt;
 	    }
 
 	    return gantt;
