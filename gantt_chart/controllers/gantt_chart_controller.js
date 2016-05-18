@@ -132,6 +132,8 @@ define(function (require) {
             return a.startDate - b.startDate;
         });
 
+        taskNames.sort();
+
         var startTime = datemath.parse(globalState.time.from);
         var endTime = datemath.parse(globalState.time.to);
 
@@ -254,6 +256,9 @@ define(function (require) {
         newBlock.end = elem._source[$scope.vis.params.endDateField];
         newBlock.name = elem._source[$scope.vis.params.breakByField];
 
+        // If one of the basic parameters isn't defined in the hit then ignore it.
+        if ((!newBlock.start) || (!newBlock.end) || (newBlock.name == undefined)) return;
+
         // Custom fields for the tooltip
         $scope.customFields = [$scope.vis.params.breakByField];
         // This will take the tooltip configuration from the params screen.
@@ -284,6 +289,12 @@ define(function (require) {
 
         resultsSet.push(newBlock);
       })
+    
+      // If all the results had missing fields then don't present the widget.
+      if (resultsSet.length == 0) {
+        $scope.state = resultsState.empty;
+        return;
+      }
 
       // Sometimes the widget panel isn't set yet and it's size doesn't fit the chart
       // A small timeout fixes it by giving time to the panel to resize.

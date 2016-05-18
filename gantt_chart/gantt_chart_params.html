@@ -19,7 +19,7 @@
 	<div>
 		<label class="advanced-toggle" href="#" ng-click="advanced = !advanced"><u>--Advanced--</u></label>
 	</div>
-	<div ng-hide="advanced">
+	<div ng-hide="!advanced">
 		<div class="form-group">
 			<label>Break by field - Color</label><br/>
 			<input type="checkbox" ng-model="vis.params.colorEnabled"><label> Enabled</label>
