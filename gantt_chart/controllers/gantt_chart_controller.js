@@ -1,7 +1,7 @@
 define(function (require) {
 
   var module = require('modules').get('kibana/gantt_chart', ['kibana']);
-  module.controller('KbnGanttChartController', function ($scope, Private, courier, config, globalState) {
+  module.controller('GanttChartController', function ($scope, $element, Private, courier, config, globalState, $timeout) {
 
     var resultsState = 
     {
@@ -39,7 +39,7 @@ define(function (require) {
         $scope.data = {};
 
         // The courier needs time to initialize or else there is a weird kibana error in the console.
-        setTimeout(function() {
+        $timeout(function() {
           courier.indexPatterns.get($scope.searchIndex).then(function(indexPattern) {
             indexPattern.fields.forEach(function(elem) {
               // Can filter which fields are optional for filtering(regex maybe).
@@ -196,7 +196,7 @@ define(function (require) {
         }
 
         // Set tasks and container element.
-        gantt(tasks, "#chart_div");
+        gantt(tasks, $element.find( ".gantt-chart-vis" ));
     }
 
     // Get the data for the widget table.
@@ -287,7 +287,7 @@ define(function (require) {
 
       // Sometimes the widget panel isn't set yet and it's size doesn't fit the chart
       // A small timeout fixes it by giving time to the panel to resize.
-      setTimeout(function () {
+      $timeout(function () {
         showData(resultsSet);
       }, 200);
     }

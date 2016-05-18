@@ -68,7 +68,7 @@
   margin-left: 35%;
 }
 
-#chart_div {
+.gantt-chart-vis {
   height: 100%;
   width: 100%;
   position: absolute;

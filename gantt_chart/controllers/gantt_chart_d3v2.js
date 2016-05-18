@@ -91,11 +91,9 @@ define(function (require) {
 	    
 	    function gantt(tasks, element) {
 
-	    	containerElement = $(element);
-
 	    	// Set minimal and active size for the chart.
-	    	width = containerElement.width() - padding.left - padding.right;
-	    	height = containerElement.height() - padding.top - padding.bottom;
+	    	width = element.width() - padding.left - padding.right;
+	    	height = element.height() - padding.top - padding.bottom;
 
 	    	width = width < 440 ? 440 : width;
 	    	height = height < 150 ? 150 : height;
@@ -105,13 +103,13 @@ define(function (require) {
 			initAxis();
 
 			// Empty previous chart draw, the redraw function should be used somewhow instead.
-			containerElement.empty();
+			element.empty();
 
 			var tooltip = d3.select("body").append("div")   
 					    .attr("class", "gantt-tooltip")               
 					    .style("opacity", 0);
 
-			var svg = d3.select(element)
+			var svg = d3.select(element[0])
 				.append("svg")
 				.attr("class", "chart")
 				.attr("width", width)
