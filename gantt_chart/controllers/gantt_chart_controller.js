@@ -1,7 +1,7 @@
 define(function (require) {
 
   var module = require('modules').get('kibana/gantt_chart', ['kibana']);
-  module.controller('GanttChartController', function ($scope, $element, Private, courier, config, globalState, $timeout) {
+  module.controller('GanttChartController', function ($scope, $element, Private, courier, config, globalState, $timeout, timefilter) {
 
     var resultsState = 
     {
@@ -198,7 +198,7 @@ define(function (require) {
         }
 
         // Set tasks and container element.
-        gantt(tasks, $element.find( ".gantt-chart-vis" ));
+        gantt(tasks, $element.find( ".gantt-chart-vis" ), timefilter);
     }
 
     // Get the data for the widget table.
