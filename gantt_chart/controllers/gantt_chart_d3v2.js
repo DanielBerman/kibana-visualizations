@@ -105,26 +105,28 @@ define(function (require) {
 
 			// Empty previous chart draw, the redraw function should be used somewhow instead.
 			element.empty();
+			// Hide old tooltips if left after page refresh (bugfix)
+			$('.gantt-tooltip').css("opacity", 0);
 
 			var brush = d3.svg.brush()
-						.x(x)
-						//.extent([timeDomainStart, timeDomainEnd])
-						.on("brushend", function () {
-							var extent = brush.extent();
+				.x(x)
+				.on("brushend", function () {
+					var extent = brush.extent();
 
-							var from = moment(extent[0]);
-							var to = moment(extent[1]);
+					var from = moment(extent[0]);
+					var to = moment(extent[1]);
 
-							if (to - from === 0) return;
+					if (to - from === 0) return;
 
-							timefilter.time.from = from;
-							timefilter.time.to = to;
-							timefilter.time.mode = 'absolute';
-						});
+					timefilter.time.from = from;
+					timefilter.time.to = to;
+					timefilter.time.mode = 'absolute';
+				});
 
-			var tooltip = d3.select("body").append("div")   
-					    .attr("class", "gantt-tooltip")               
-					    .style("opacity", 0);
+			var tooltip = d3.select("body")
+				.append("div")   
+			    .attr("class", "gantt-tooltip")               
+			    .style("opacity", 0);
 
 			var svg = d3.select(element[0])
 				.append("svg")
