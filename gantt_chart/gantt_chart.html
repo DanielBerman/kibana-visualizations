@@ -1,0 +1,16 @@
+<div ng-controller="GanttChartController" class="table-vis">
+	<div ng-switch="state">
+    	<div ng-switch-when="full">
+	    	<div class="gantt-chart-vis">
+		    </div>
+	    </div>
+	    <div ng-switch-when="empty" class="text-center visualize-error visualize-chart">
+	    	<div class="item top"></div>
+			<div class="item">
+				<h2 aria-hidden="true"><i aria-hidden="true" class="fa fa-meh-o"></i></h2>
+				<h4>No results found</h4>
+			</div>
+			<div class="item bottom"></div>
+	    </div>
+    </div>
+</div>

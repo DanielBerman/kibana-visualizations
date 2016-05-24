@@ -1,0 +1,41 @@
+<div ng-controller="GanttChartController">
+	<div class="form-group">
+		<label>Filter by field</label><br/>
+		<select ng-model="vis.params.filteredField" ng-options="option for option in data.fieldsArr" class="form-control"/>
+		<input id="filter-value" type="text" ng-model="vis.params.filterValue" class="form-control" placeholder="Type a value to filter..">
+	</div>
+	<div class="form-group">
+		<label>Start date field</label><br/>
+		<select ng-model="vis.params.startDateField" ng-options="option for option in data.dateFieldsArr" class="form-control"/>
+	</div>
+	<div class="form-group">
+		<label>End date field</label><br/>
+		<select ng-model="vis.params.endDateField" ng-options="option for option in data.dateFieldsArr" class="form-control"/>
+	</div>
+	<div class="form-group">
+		<label>Break by field - Y Axis</label><br/>
+		<select ng-model="vis.params.breakByField" ng-options="option for option in data.fieldsArr" class="form-control"/>
+	</div>
+	<div>
+		<label class="advanced-toggle" href="#" ng-click="advanced = !advanced"><u>--Advanced--</u></label>
+	</div>
+	<div ng-hide="!advanced">
+		<div class="form-group">
+			<label>Break by field - Color</label><br/>
+			<input type="checkbox" ng-model="vis.params.colorEnabled"><label> Enabled</label>
+			<select ng-model="vis.params.colorField" ng-disabled="!vis.params.colorEnabled" ng-options="option for option in data.fieldsArr" class="form-control"/>
+		</div>
+		<div class="form-group">
+			<label>Result size </label><br/>
+			<input type="number" ng-model="vis.params.resultLimit" min="1" class="form-control"/>
+		</div>
+		<div class="form-group">
+			<label>Custom color configuration </label><br/>
+			<textarea ng-model="vis.params.colorAlias" class="form-control" rows="10"></textarea>
+		</div>
+		<div class="form-group">
+			<label>Custom tooltip fields configuration </label><br/>
+			<textarea ng-model="vis.params.tooltipFields" class="form-control" rows="4"></textarea>
+		</div>
+	</div>
+</div>
